@@ -1,6 +1,7 @@
-import { Store } from "./Store";
-export declare abstract class PersistentStore<Props, State extends Storage, Storage> extends Store<Props, State> {
+import { BaseStore } from "./BaseStore";
+export declare abstract class PersistentStore<Props, State extends Storage, Storage> extends BaseStore<Props, State> {
     constructor();
     load(serialized: string): void;
-    abstract save(): Storage;
+    save(): string;
+    protected readonly abstract storage: Storage;
 }

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Onlinegroup state management for single page applications",
   "main": "lib/main/index.js",
+  "types": "lib/main/index.d.ts",
   "repository": "https://github.com/onlinegroupat/og-spa-state.git",
   "scripts": {
     "build": "tsc",
