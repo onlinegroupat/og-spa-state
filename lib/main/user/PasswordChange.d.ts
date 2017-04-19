@@ -21,7 +21,7 @@ export declare namespace PasswordChange {
          */
         changePassword(userId: number, oldPassword: string, newPassword: string): Promise<void>;
     }
-    class Store extends BaseStore<PasswordChange.Props, PasswordChange.State> implements Readonly<PasswordChange.Props> {
+    class Store extends BaseStore<PasswordChange.Props, PasswordChange.State> {
         private service;
         constructor(service: Service);
         readonly userId: number;
