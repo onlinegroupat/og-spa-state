@@ -1,14 +1,18 @@
-export declare class PromisedValue<T> {
-    readonly promise: Promise<T>;
+export declare class PromiseState<T> {
+    private readonly promise;
     constructor(promise: Promise<T>);
     private _state;
     private _reason;
-    private _value;
     readonly pending: boolean;
     readonly rejected: boolean;
     readonly fulfilled: boolean;
-    readonly value: T;
     readonly reason: any;
-    private fulfill(value);
-    private reject(reason);
+    protected fulfill(value: T): void;
+    protected reject(reason: any): void;
+}
+export declare class PromisedValue<T> extends PromiseState<T> {
+    constructor(promise: Promise<T>);
+    private _value;
+    readonly value: T;
+    protected fulfill(value: T): void;
 }

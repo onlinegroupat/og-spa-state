@@ -7,9 +7,8 @@ enum State {
     Rejected
 }
 
-export class PromisedValue<T> {
-
-    constructor(public readonly promise:Promise<T>) {
+export class PromiseState<T> {
+    constructor(private readonly promise:Promise<T>) {
         this._state = State.Pending;
         promise.then(value => this.fulfill(value));
         promise.catch(reason => this.reject(reason));
@@ -20,9 +19,6 @@ export class PromisedValue<T> {
 
     @observable
     private _reason:any;
-
-    @observable
-    private _value:T;
 
     @computed
     public get pending():boolean {
@@ -40,24 +36,39 @@ export class PromisedValue<T> {
     }
 
     @computed
-    public get value():T {
-        return this._value;
-    }
-
-    @computed
     public get reason():any {
         return this._reason;
     }
 
     @action
-    private fulfill(value:T) {
-        this._value = value;
+    protected fulfill(value:T) {
         this._state = State.Fulfilled;
     }
 
     @action
-    private reject(reason:any) {
+    protected reject(reason:any) {
         this._reason = reason;
         this._state = State.Rejected;
+    }
+}
+
+export class PromisedValue<T> extends PromiseState<T> {
+
+    constructor(promise:Promise<T>) {
+        super(promise);
+    }
+
+    @observable
+    private _value:T;
+
+    @computed
+    public get value():T {
+        return this._value;
+    }
+
+    @action
+    protected fulfill(value:T) {
+        super.fulfill(value);
+        this._value = value;
     }
 }

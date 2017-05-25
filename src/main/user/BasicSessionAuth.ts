@@ -50,19 +50,19 @@ export namespace BasicSessionAuth {
         }
 
         @observable
-        public readonly username:string;
+        readonly username:string;
 
         @observable
-        public readonly password:string;
+        readonly password:string;
 
         @observable
-        public readonly loginState:PromisedValue<void>;
+        readonly loginState:PromisedValue<void>;
 
         @observable
-        public readonly logoutState:PromisedValue<void>;
+        readonly logoutState:PromisedValue<void>;
 
         @observable
-        public readonly sessionId:string;
+        readonly sessionId:string;
 
         @action
         public login():Promise<void> {
