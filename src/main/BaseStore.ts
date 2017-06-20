@@ -1,11 +1,17 @@
 
 import {action} from "mobx";
+import {PropertyAccess} from "./PropertyAccess";
 
-export class BaseStore<Props, State> {
+export class BaseStore<Props extends { [key:string]:any }, State>
+    implements PropertyAccess<Props> {
 
     @action
-    public setProps<K extends keyof Props>(props:Pick<Props, K>) {
+    setProps<K extends keyof Props>(props:Pick<Props, K>) {
         Object.assign(this, props);
+    }
+
+    getProp<K extends keyof this>(name:K):Props[K] {
+        return this[name];
     }
 
     @action
