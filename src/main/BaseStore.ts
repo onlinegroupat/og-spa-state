@@ -5,6 +5,12 @@ import {PropertyAccess} from "./PropertyAccess";
 export abstract class BaseStore<Props extends { [key:string]:any }, State>
     implements PropertyAccess<Props> {
 
+    constructor(props?:Pick<Props, keyof Props>) {
+        if (props) {
+            this.setProps(props);
+        }
+    }
+
     get target():Readonly<Props & State> {
         // we really want to save the values in `this`...
         // subclasses should declare the properties of Props and State, but right
