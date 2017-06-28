@@ -1,8 +1,8 @@
 
-import {action} from "mobx";
+import {action, observable} from "mobx";
 import {PropertyAccess} from "./PropertyAccess";
 
-export abstract class BaseStore<Props extends { [key:string]:any }, State>
+export class BaseStore<Props extends { [key:string]:any }, State>
     implements PropertyAccess<Props> {
 
     constructor(props?:Pick<Props, keyof Props>) {
@@ -21,7 +21,7 @@ export abstract class BaseStore<Props extends { [key:string]:any }, State>
 
     @action
     setProps<K extends keyof Props>(props:Pick<Props, K>) {
-        Object.assign(this, props);
+        Object.assign(this.target, props);
     }
 
     getProp<K extends keyof Props>(name:K):Props[K] {
@@ -30,6 +30,10 @@ export abstract class BaseStore<Props extends { [key:string]:any }, State>
 
     @action
     protected setState<K extends keyof State>(state:Pick<State, K>) {
-        Object.assign(this, state);
+        Object.assign(this.target, state);
+    }
+
+    static createFrom<T>(obj:T):Readonly<T> & PropertyAccess<T> {
+        return new BaseStore<T, {}>(observable.object(obj)) as any;
     }
 }
