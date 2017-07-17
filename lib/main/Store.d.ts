@@ -3,7 +3,7 @@ export declare class Store<Props extends Object, State> implements PropertyAcces
     private _backingObject;
     constructor(initProps?: Props, initState?: State, _backingObject?: (Props & State) | undefined);
     protected readonly backingObject: Props & State;
-    setProps(props: Partial<Props>): void;
+    setProps<K extends keyof Props>(props: Pick<Props, K>): void;
     getProp<K extends keyof Props>(name: K): Props[K];
     protected setState<K extends keyof State>(state: Pick<State, K>): void;
     static createFrom<T>(obj: T): Readonly<T> & PropertyAccess<T>;
