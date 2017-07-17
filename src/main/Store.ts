@@ -17,7 +17,7 @@ export class Store<Props extends Object, State> implements PropertyAccess<Props>
     }
 
     @action
-    setProps<K extends keyof Props>(props:Pick<Props, K>) {
+    setProps(props:Partial<Props>) {
         extendObservable(this.backingObject, props as any);
     }
 
