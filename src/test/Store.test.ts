@@ -1,5 +1,5 @@
 import {reaction} from "mobx";
-import {Store} from "../main/Store";
+import {ObjectBackedStore, SimpleStore, StoreBase} from "../main/Store";
 
 describe('Store', () => {
     test('createFrom', () => {
@@ -10,7 +10,7 @@ describe('Store', () => {
             unused?:Date;
         }
 
-        let dog = Store.createFrom<Dog>({
+        let dog = SimpleStore.fromProps<Dog>({
             name:'Good boy',
             foo:undefined // required to track changes to `foo`
         });
@@ -48,7 +48,7 @@ describe('Store', () => {
             state:string;
         }
 
-        class MyStore extends Store<MyProps, MyState> implements Readonly<MyProps & MyState> {
+        class MyStore extends StoreBase<MyProps, MyState> implements Readonly<MyProps & MyState> {
             readonly foo:string;
             readonly bar:string;
             readonly state:string;
@@ -83,7 +83,7 @@ describe('Store', () => {
 
         let backingObject = Object.assign({}, props, state);
 
-        let myState = new Store(props, state, backingObject);
+        let myState = SimpleStore.backedBy(backingObject);
 
         myState.setProps({'foo': 'x'});
 
@@ -101,7 +101,7 @@ describe('Store', () => {
             state:string;
         }
 
-        class MyStore extends Store<MyProps, MyState>  {
+        class MyStore extends StoreBase<MyProps, MyState>  {
 
             public myBackingObject = {
                 foo:'x',

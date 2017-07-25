@@ -1,19 +1,10 @@
 import {PropertyAccess} from "./PropertyAccess";
 import {action, extendObservable} from "mobx";
 
-export class Store<Props extends Object, State> implements PropertyAccess<Props> {
+export class StoreBase<Props extends Object, State> implements PropertyAccess<Props> {
 
-    constructor(initProps?:Props, initState?:State, private _backingObject?:Props & State) {
-        if (initProps) {
-            this.setProps(initProps);
-        }
-        if (initState) {
-            this.setState(initState);
-        }
-    }
-
-    protected get backingObject():Props & State {
-        return this._backingObject || this as any;
+    get backingObject():Props & State {
+        return this as any;
     }
 
     @action
@@ -29,8 +20,30 @@ export class Store<Props extends Object, State> implements PropertyAccess<Props>
     protected setState<K extends keyof State>(state:Pick<State, K>) {
         extendObservable(this.backingObject, state as any);
     }
+}
 
-    public static createFrom<T>(obj:T):Readonly<T> & PropertyAccess<T> {
-        return new Store(obj) as any as Readonly<T> & PropertyAccess<T>;
+export class ObjectBackedStore<Props extends Object> extends StoreBase<Props, {}> {
+    constructor(private _backingObject:Props) {
+        super();
+        extendObservable(_backingObject);
+    }
+
+    get backingObject():Props {
+        return this._backingObject;
+    }
+}
+
+export class SimpleStore {
+    static fromProps<T>(initProps?:T):PropertyAccess<T> & Readonly<T> {
+        let store = new StoreBase<T, {}>();
+        if (initProps) {
+            store.setProps(initProps)
+        }
+        return store as any;
+    }
+
+    static backedBy<T>(obj:T):PropertyAccess<T> {
+        return new ObjectBackedStore(obj);
+
     }
 }
