@@ -3,43 +3,45 @@ import {action, extendObservable} from "mobx";
 
 export class StoreBase<Props extends Object, State> implements PropertyAccess<Props> {
 
-    get backingObject():Props & State {
-        return this as any;
+    constructor(props: Props, state: State) {
+        extendObservable(this, props as any);
+        extendObservable(this, state as any);
     }
 
     @action
     setProps<K extends keyof Props>(props:Pick<Props, K>) {
-        extendObservable(this.backingObject, props as any);
+        Object.assign(this, props);
     }
 
     getProp<K extends keyof Props>(name:K):Props[K] {
-        return this.backingObject[name];
+        return (this as any)[name];
     }
 
     @action
     protected setState<K extends keyof State>(state:Pick<State, K>) {
-        extendObservable(this.backingObject, state as any);
+        Object.assign(this, state);
     }
 }
 
-export class ObjectBackedStore<Props extends Object> extends StoreBase<Props, {}> {
+export class ObjectBackedStore<Props extends Object> implements PropertyAccess<Props> {
     constructor(private _backingObject:Props) {
-        super();
-        extendObservable(_backingObject);
+        extendObservable(_backingObject, _backingObject);
     }
 
-    get backingObject():Props {
-        return this._backingObject;
+    @action
+    setProps<K extends keyof Props>(props:Pick<Props, K>) {
+        Object.assign(this._backingObject, props);
     }
+
+    getProp<K extends keyof Props>(name:K):Props[K] {
+        return this._backingObject[name];
+    }
+
 }
 
 export class SimpleStore {
-    static fromProps<T>(initProps?:T):PropertyAccess<T> & Readonly<T> {
-        let store = new StoreBase<T, {}>();
-        if (initProps) {
-            store.setProps(initProps)
-        }
-        return store as any;
+    static fromProps<T>(initProps:T):PropertyAccess<T> & Readonly<T> {
+        return new StoreBase<T, {}>(initProps, {}) as any;
     }
 
     static backedBy<T>(obj:T):PropertyAccess<T> {

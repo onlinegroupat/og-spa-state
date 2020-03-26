@@ -1,5 +1,5 @@
 
-import {PromisedValue} from "../main/PromisedValue";
+import {PromisedValue} from "../main";
 describe('PromisedValue', () => {
 
     test('fulfilled', () => {

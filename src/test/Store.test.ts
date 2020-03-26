@@ -1,5 +1,5 @@
-import {reaction} from "mobx";
-import {ObjectBackedStore, SimpleStore, StoreBase} from "../main/Store";
+import {autorun, reaction} from "mobx";
+import {ObjectBackedStore, SimpleStore, StoreBase} from "../main";
 
 describe('Store', () => {
     test('createFrom', () => {
@@ -14,10 +14,16 @@ describe('Store', () => {
             name:'Good boy',
             foo:undefined // required to track changes to `foo`
         });
+        console.log("dog", dog);
 
         // react to change on dog and write them to updatedDog
         let updatedDog:Dog = { name:'' };
-        reaction(() => dog.name, name => updatedDog.name = name);
+
+        autorun(() => console.log("dog name", dog.name));
+        reaction(() => dog.name, name => {
+            console.log("name changed");
+            updatedDog.name = name
+        });
         reaction(() => dog.foo, foo => updatedDog.foo = foo);
 
         // change properties on dog
@@ -26,12 +32,13 @@ describe('Store', () => {
             foo:9000
         });
 
+        // Direct readonly access should work on store
+        expect(dog.name).toBe('Bad boy');
+        expect(dog.foo).toBe(9000);
+
         // updatedDog should reflect our changes
         expect(updatedDog.name).toBe('Bad boy');
         expect(updatedDog.foo).toBe(9000);
-
-        // Direct readonly access should work on store
-        expect(dog.name).toBe('Bad boy');
 
         // this should not compile:
         // dog.name = 'test';
@@ -58,7 +65,7 @@ describe('Store', () => {
             }
         }
 
-        let myState = new MyStore();
+        let myState = new MyStore({ foo: "foo", bar: "bar"}, {state: "v"});
 
         // should not compile
         // myState.foo = 'test';
@@ -73,58 +80,16 @@ describe('Store', () => {
 
     test('backingObject', () => {
 
-        let props = {
+        const obj = {
             foo:'bar',
         };
 
-        let state = {
-            bar:'baz',
-        };
+        const store = SimpleStore.backedBy(obj);
 
-        let backingObject = Object.assign({}, props, state);
+        store.setProps({foo: 'x'});
 
-        let myState = SimpleStore.backedBy(backingObject);
-
-        myState.setProps({'foo': 'x'});
-
-        expect(backingObject.foo).toBe('x');
+        expect(obj.foo).toBe('x');
     });
 
-    test('subclass with backingObject', () => {
-
-        interface MyProps {
-            foo:string;
-            bar:string;
-        }
-
-        interface MyState {
-            state:string;
-        }
-
-        class MyStore extends StoreBase<MyProps, MyState>  {
-
-            public myBackingObject = {
-                foo:'x',
-                bar:'y',
-                state:'z'
-            };
-
-            get backingObject() {
-                return this.myBackingObject;
-            }
-
-            updateState(value:string) {
-                this.setState({state: value});
-            }
-        }
-
-        let myState = new MyStore();
-
-        myState.setProps({'foo': 'baz'});
-        expect(myState.myBackingObject.foo).toBe('baz');
-
-        myState.updateState('baz');
-        expect(myState.myBackingObject.state).toBe('baz');
-    })
 });
 
