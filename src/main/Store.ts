@@ -3,11 +3,6 @@ import {action, extendObservable} from "mobx";
 
 export class StoreBase<Props extends Object, State> implements PropertyAccess<Props> {
 
-    constructor(props: Props, state: State) {
-        extendObservable(this, props as any);
-        extendObservable(this, state as any);
-    }
-
     @action
     setProps<K extends keyof Props>(props:Pick<Props, K>) {
         Object.assign(this, props);
@@ -41,7 +36,9 @@ export class ObjectBackedStore<Props extends Object> implements PropertyAccess<P
 
 export class SimpleStore {
     static fromProps<T>(initProps:T):PropertyAccess<T> & Readonly<T> {
-        return new StoreBase<T, {}>(initProps, {}) as any;
+        const store = new StoreBase();
+        extendObservable(store, initProps);
+        return store as any;
     }
 
     static backedBy<T>(obj:T):PropertyAccess<T> {

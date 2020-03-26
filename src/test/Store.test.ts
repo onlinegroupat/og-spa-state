@@ -1,8 +1,8 @@
-import {autorun, reaction} from "mobx";
+import {autorun, observable, reaction} from "mobx";
 import {ObjectBackedStore, SimpleStore, StoreBase} from "../main";
 
 describe('Store', () => {
-    test('createFrom', () => {
+    test('fromProps', () => {
 
         interface Dog {
             name:string;
@@ -56,8 +56,14 @@ describe('Store', () => {
         }
 
         class MyStore extends StoreBase<MyProps, MyState> implements Readonly<MyProps & MyState> {
+
+            @observable
             readonly foo:string;
+
+            @observable
             readonly bar:string;
+
+            @observable
             readonly state:string;
 
             updateState(value:string) {
@@ -65,7 +71,7 @@ describe('Store', () => {
             }
         }
 
-        let myState = new MyStore({ foo: "foo", bar: "bar"}, {state: "v"});
+        let myState = new MyStore();
 
         // should not compile
         // myState.foo = 'test';
